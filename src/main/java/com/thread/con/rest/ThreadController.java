@@ -18,12 +18,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @RestController
-@RequestMapping("thread")
+@RequestMapping("thread-queue")
 public class ThreadController {
 
 
     public long time;
     public long time2;
+
+    private static int queueCount = MQProvider.threadCnt;
+
 
     private static ExecutorService threadPool = null;
     private static ExecutorService threadPoolExecute = null;
@@ -43,10 +46,7 @@ public class ThreadController {
         time = 0;
 
         for (int k = 0; k < loopC; k++) {
-
-
             long start = System.currentTimeMillis();
-
             //例如1000个直播间
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom liveRoom = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
@@ -61,6 +61,7 @@ public class ThreadController {
             start = System.currentTimeMillis();
             //开启定时任务
             RoomsDispatcher.getInstance().init();
+            //单线程推送
 //        RoomsDispatcher.getInstance().batchSend();
             while (true) {
                 if (StaticMessageRecord.atomicLong.get() >= roomCount * msgCount) {
@@ -68,8 +69,6 @@ public class ThreadController {
                     long cost = (end - start);
                     time = time + cost;
                     System.out.println(roomCount * msgCount + " 条消息 定时 共耗时：" + cost + "ms");
-
-//
                     RoomsDispatcher.getInstance().getScheduledExecutorService().shutdown();
                     RoomsDispatcher.getInstance().cleanRoom();
                     StaticMessageRecord.atomicLong.set(0);
@@ -88,22 +87,19 @@ public class ThreadController {
      * @param loopC     循环次数
      * @param msgCount  每个直播间消息数量
      * @param roomCount 直播间数量
+     * @desc: 请求样例：http://127.0.0.1:11780/thread/zyQueue?roomCount=1000&msgCount=1000&loopC=20
      */
     @RequestMapping(value = "zyQueue",method = RequestMethod.GET)
     public String zyQueue(@RequestParam("roomCount") int roomCount,
                           @RequestParam("msgCount") int msgCount,
                           @RequestParam("loopC") int loopC) {
+        //初始化time为0
         time = 0;
         time2 = 0;
-
         for (int k = 0; k < loopC; k++) {
-            threadPool =
-                    ThreadPoolMonitor.newFixedThreadPool(MQProvider.threadCnt, "excute-send-msg");
-
-
+            threadPool = ThreadPoolMonitor.
+                    newFixedThreadPool(MQProvider.threadCnt, "excute-send-msg");
             long start = System.currentTimeMillis();
-            int queueCount = MQProvider.threadCnt;
-
             //生产消息 1000000 条消息
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom room = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
@@ -152,23 +148,19 @@ public class ThreadController {
      * @param loopC     循环次数
      * @param msgCount  每个直播间消息数量
      * @param roomCount 直播间数量
+     * @desc: 请求样例： http://127.0.0.1:11780/thread/zyQueue2?roomCount=1000&msgCount=1000&loopC=20
      */
     @RequestMapping(value = "zyQueue2",method = RequestMethod.GET)
     public String zyQueue2(@RequestParam("roomCount") int roomCount,
                            @RequestParam("msgCount") int msgCount,
                            @RequestParam("loopC") int loopC) {
 
+        //初始化time 为0
         time = 0;
-
         for (int k = 0; k < loopC; k++) {
-            threadPool =
-                    ThreadPoolMonitor.newFixedThreadPool(MQProvider.threadCnt, "excute-send-msg");
-
-            threadPoolExecute = Executors.newSingleThreadExecutor();
-
+            threadPool = ThreadPoolMonitor.
+                    newFixedThreadPool(MQProvider.threadCnt, "excute-send-msg");
             long start = System.currentTimeMillis();
-            int queueCount = MQProvider.threadCnt;
-
             //生产消息 msgCount*roomCount 条消息
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom room = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
@@ -178,10 +170,7 @@ public class ThreadController {
                 }
                 MQProvider.push(room, String.valueOf(i));
             }
-
-
             System.out.println("自研 生成消息 耗费时间：" + (System.currentTimeMillis() - start) + "ms");
-
             start = System.currentTimeMillis();
             //30个线程消费消息
             for (int i = 0; i < MQProvider.threadCnt; i++) {
@@ -189,17 +178,15 @@ public class ThreadController {
                         i % queueCount));
             }
             threadPool.shutdown();
-            long finalStart1 = start;
             while (true) {
                 if (threadPool.isTerminated()) {
                     final long end = System.currentTimeMillis();
-                    long cost = (end - finalStart1);
+                    long cost = (end - start);
                     System.out.println(roomCount * msgCount + " 条消息 自研 共耗时：" + cost + "ms");
                     time = time + cost;
                     break;
                 }
             }
-
         }
         System.out.println(loopC + "次请求 " + (roomCount * msgCount * 10) + " 条消息， avg time：" + time / loopC + "ms");
         return loopC + " 次请求 " + (roomCount * msgCount * 10) + " 条消息， avg time：" + time / loopC + "ms";
@@ -212,22 +199,19 @@ public class ThreadController {
      * @param loopC     循环次数
      * @param msgCount  每个直播间消息数量
      * @param roomCount 直播间数量
+     * @desc: 请求样例：http://127.0.0.1:11780/thread/master?roomCount=2000&msgCount=5000&loopC=20
      */
     @RequestMapping(value = "master",method = RequestMethod.GET)
     public String master(@RequestParam("roomCount") int roomCount,
                          @RequestParam("msgCount") int msgCount,
                          @RequestParam("loopC") int loopC) {
 
+        //初始化time为0
         time = 0;
         for (int k = 0; k < loopC; k++) {
-
-
             long start = System.currentTimeMillis();
-
             /**初始化 master 任务 将会由worker 进行处理，worker 数量为 30个*/
             Master master = new Master(new Worker(), MQProvider.threadCnt);
-
-
             //例如1000个直播间
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom liveRoom = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
@@ -241,10 +225,8 @@ public class ThreadController {
 
             System.out.println("master-worker 设计模式 新自研线程模型 生成消息 耗费时间：" + (System.currentTimeMillis() - start) + "ms");
             start = System.currentTimeMillis();
-
             /**master 开始执行*/
             master.execute();
-
             while (true) {
                 /**判断所有worker 是否执行完成*/
                 if (master.isComplete()) {
