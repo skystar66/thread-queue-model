@@ -11,6 +11,7 @@ import com.thread.con.result.StaticMessageRecord;
 import com.thread.con.room.LiveRoom;
 import com.thread.con.room.RoomsDispatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +32,14 @@ public class ThreadController {
     private static ExecutorService threadPoolExecute = null;
 
 
-    @RequestMapping("time")
+    /**
+     * 定时任务 消息处理设计方案
+     *
+     * @param loopC     循环次数
+     * @param msgCount  每个直播间消息数量
+     * @param roomCount 直播间数量
+     */
+    @RequestMapping(value = "time",method = RequestMethod.GET)
     public String time(@RequestParam("roomCount") int roomCount,
                        @RequestParam("msgCount") int msgCount,
                        @RequestParam("loopC") int loopC) {
@@ -77,7 +85,14 @@ public class ThreadController {
     }
 
 
-    @RequestMapping("zyQueue")
+    /**
+     * 自研 线程---队列 对内的消息处理吞吐量 消息处理设计方案
+     *
+     * @param loopC     循环次数
+     * @param msgCount  每个直播间消息数量
+     * @param roomCount 直播间数量
+     */
+    @RequestMapping(value = "zyQueue",method = RequestMethod.GET)
     public String zyQueue(@RequestParam("roomCount") int roomCount,
                           @RequestParam("msgCount") int msgCount,
                           @RequestParam("loopC") int loopC) {
@@ -113,7 +128,7 @@ public class ThreadController {
             threadPool.shutdown();
             long finalStart = start;
             while (true) {
-                if (StaticMessageRecord.atomicLong.get()>=roomCount*msgCount) {
+                if (StaticMessageRecord.atomicLong.get() >= roomCount * msgCount) {
                     final long end = System.currentTimeMillis();
                     long cost = (end - finalStart);
                     time2 = time2 + cost;
@@ -129,7 +144,7 @@ public class ThreadController {
 
             try {
                 Thread.sleep(2000);
-            }catch (Exception ex) {
+            } catch (Exception ex) {
 
             }
 
@@ -139,7 +154,14 @@ public class ThreadController {
     }
 
 
-    @RequestMapping("zyQueue2")
+    /**
+     * 自研 线程----队列 对外的qps吞吐量 消息处理设计方案
+     *
+     * @param loopC     循环次数
+     * @param msgCount  每个直播间消息数量
+     * @param roomCount 直播间数量
+     */
+    @RequestMapping(value = "zyQueue2",method = RequestMethod.GET)
     public String zyQueue2(@RequestParam("roomCount") int roomCount,
                            @RequestParam("msgCount") int msgCount,
                            @RequestParam("loopC") int loopC) {
@@ -193,11 +215,14 @@ public class ThreadController {
     }
 
 
-
-
-
-
-    @RequestMapping("master")
+    /**
+     * 自研 master-worker 消息处理设计方案
+     *
+     * @param loopC     循环次数
+     * @param msgCount  每个直播间消息数量
+     * @param roomCount 直播间数量
+     */
+    @RequestMapping(value = "master",method = RequestMethod.GET)
     public String master(@RequestParam("roomCount") int roomCount,
                          @RequestParam("msgCount") int msgCount,
                          @RequestParam("loopC") int loopC) {
