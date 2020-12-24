@@ -1,6 +1,6 @@
 package com.thread.con.monitor;
 
-import com.thread.con.MQProvider;
+import com.thread.con.queue.MQProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

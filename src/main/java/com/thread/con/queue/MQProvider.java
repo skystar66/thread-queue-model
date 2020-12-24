@@ -1,4 +1,4 @@
-package com.thread.con;
+package com.thread.con.queue;
 
 
 import com.thread.con.room.LiveRoom;

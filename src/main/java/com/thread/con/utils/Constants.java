@@ -1,4 +1,4 @@
-package com.thread.con;
+package com.thread.con.utils;
 
 public class Constants {
 

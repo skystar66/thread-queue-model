@@ -1,6 +1,6 @@
 package com.thread.con.room;
 
-import com.thread.con.Constants;
+import com.thread.con.utils.Constants;
 import com.thread.con.result.StaticMessageRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class LiveRoom {
         return messages.add(msg);
     }
 
-    private void dumpQueue() {
+    private void takeQueue() {
         String poll = null;
         int take = 0;
         while ((poll = messages.poll()) != null) {
@@ -88,7 +88,7 @@ public class LiveRoom {
         }
     }
 
-    private List<String> dumpQueue2() {
+    private List<String> takeQueue2() {
         String poll = null;
         List<String> tempArray = new ArrayList<>();
         int take = 0;
@@ -98,7 +98,6 @@ public class LiveRoom {
 
             if (take >= Constants.QUEUE_SIZE) {
                 StaticMessageRecord.atomicLong.addAndGet(take);
-//                dumpQueue();
                 break;
             }
         }
@@ -108,7 +107,7 @@ public class LiveRoom {
 
     public void batchSend() {
 
-       this.dumpQueue();
+       this.takeQueue();
 
 
 //        System.out.println(Thread.currentThread().getName()+"---roomId:"+roomId+" -----send msg size:"+list.size());
@@ -119,7 +118,7 @@ public class LiveRoom {
 
     public void batchSend2() {
 
-        List<String> list = this.dumpQueue2();
+        List<String> list = this.takeQueue2();
 
         if (list.size() == 0) {
             return;
@@ -130,7 +129,7 @@ public class LiveRoom {
 
     }
 
-    /**监控房间队列数*/
+    /**监控房间消息数*/
     public void monitor(){
 
         new Thread(new Runnable() {

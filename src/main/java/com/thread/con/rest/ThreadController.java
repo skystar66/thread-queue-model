@@ -1,9 +1,8 @@
 package com.thread.con.rest;
 
-import com.thread.con.MQConsumer3;
-import com.thread.con.MQConsumer4;
-import com.thread.con.MQProvider;
-import com.thread.con.ThreadPoolUtils;
+import com.thread.con.queue.MQConsumer3;
+import com.thread.con.queue.MQConsumer4;
+import com.thread.con.queue.MQProvider;
 import com.thread.con.masterwork.Master;
 import com.thread.con.masterwork.Worker;
 import com.thread.con.monitor.ThreadPoolMonitor;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,10 +51,10 @@ public class ThreadController {
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom liveRoom = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
 //            liveRoom.monitor();
-                /**没个直播间发送1000条消息*/
+                /**每个直播间发送1000条消息*/
                 for (int j = 0; j < msgCount; j++) {
                     RoomsDispatcher.getInstance().add(String.valueOf(i),
-                            String.valueOf(i));
+                            String.valueOf(j));
                 }
             }
 //        System.out.println("定时 生成消息 耗费时间：" + (System.currentTimeMillis() - start) + "ms");
@@ -110,7 +107,7 @@ public class ThreadController {
             //生产消息 1000000 条消息
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom room = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
-                /**没个直播间发送1000条消息*/
+                /**每个直播间发送1000条消息*/
                 for (int j = 0; j < msgCount; j++) {
                     RoomsDispatcher.getInstance().add2(room, "" + j);
                 }
@@ -120,10 +117,8 @@ public class ThreadController {
             start = System.currentTimeMillis();
             //30个线程消费消息
             for (int i = 0; i < MQProvider.threadCnt; i++) {
-
                 threadPool.submit(new MQConsumer3(
                         i % queueCount));
-
             }
             threadPool.shutdown();
             long finalStart = start;
@@ -140,14 +135,11 @@ public class ThreadController {
                     break;
                 }
             }
-
-
             try {
                 Thread.sleep(2000);
             } catch (Exception ex) {
 
             }
-
         }
         System.out.println(loopC + " 次请求 " + (roomCount * msgCount * loopC) + " 条消息， avg time：" + time2 / loopC + "ms");
         return loopC + " 次请求 " + (roomCount * msgCount * loopC) + " 条消息， avg time：" + time2 / loopC + "ms";
@@ -177,10 +169,10 @@ public class ThreadController {
             long start = System.currentTimeMillis();
             int queueCount = MQProvider.threadCnt;
 
-            //生产消息 1000000 条消息
+            //生产消息 msgCount*roomCount 条消息
             for (int i = 0; i < roomCount; i++) {
                 LiveRoom room = RoomsDispatcher.getInstance().createRoom(String.valueOf(i));
-                /**没个直播间发送1000条消息*/
+                /**每个直播间发送msgCount条消息*/
                 for (int j = 0; j < msgCount; j++) {
                     RoomsDispatcher.getInstance().add2(room, "" + j);
                 }
@@ -197,7 +189,6 @@ public class ThreadController {
                         i % queueCount));
             }
             threadPool.shutdown();
-
             long finalStart1 = start;
             while (true) {
                 if (threadPool.isTerminated()) {

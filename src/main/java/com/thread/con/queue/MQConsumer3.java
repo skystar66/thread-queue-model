@@ -1,14 +1,12 @@
-package com.thread.con;
+package com.thread.con.queue;
 
-import com.thread.con.monitor.ThreadPoolMonitor;
+import com.thread.con.utils.ThreadPoolUtils;
 import com.thread.con.room.LiveRoom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class MQConsumer3 implements Runnable {
@@ -20,13 +18,16 @@ public class MQConsumer3 implements Runnable {
     private ConcurrentLinkedQueue<LiveRoom> msgQueue;
 
 
-    public MQConsumer3(int queueNum) {
-        this.msgQueue = MQProvider.getFromRPCRoomMsgQueueByIndex(queueNum);
+    /**
+     * @param index 监控对列编号索引
+     * */
+    public MQConsumer3(int index) {
+        this.msgQueue = MQProvider.getFromRPCRoomMsgQueueByIndex(index);
 //        this.executors=executors;
         logger.info("当前队列 房间数量："+msgQueue.size());
     }
 
-    private void dumpQueue() {
+    private void takeQueue() {
 
         LiveRoom room = null;
         while ((room = msgQueue.poll()) != null) {
@@ -46,7 +47,7 @@ public class MQConsumer3 implements Runnable {
     @Override
     public void run() {
 
-        dumpQueue();
+        takeQueue();
 
     }
 }

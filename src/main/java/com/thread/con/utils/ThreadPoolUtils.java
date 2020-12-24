@@ -1,10 +1,7 @@
-package com.thread.con;
-
-import com.thread.con.monitor.ThreadPoolMonitor;
+package com.thread.con.utils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadPoolUtils {
 
