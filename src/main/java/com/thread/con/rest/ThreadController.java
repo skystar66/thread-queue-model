@@ -122,7 +122,7 @@ public class ThreadController {
                     final long end = System.currentTimeMillis();
                     long cost = (end - finalStart);
                     time2 = time2 + cost;
-                    System.out.println("第"+k+1+"次，"+roomCount * msgCount + " 条消息 batchSend 共耗时：" + cost + "ms");
+                    System.out.println("第"+(k+1)+"次，"+roomCount * msgCount + " 条消息 batchSend 共耗时：" + cost + "ms");
                     RoomsDispatcher.getInstance().cleanRoom();
                     StaticMessageRecord.atomicLong.set(0);
 //                    threadPoolExecute=null;
@@ -136,7 +136,7 @@ public class ThreadController {
 
             }
         }
-        System.out.println(loopC + " 次请求 " + (roomCount * msgCount * loopC) + " 条消息， avg time：" + time2 / loopC + "ms");
+        System.out.println(loopC + " 次请求 " + (roomCount * msgCount * loopC) + " 条消息， Avg Time：" + time2 / loopC + "ms");
         return loopC + " 次请求 " + (roomCount * msgCount * loopC) + " 条消息， avg time：" + time2 / loopC + "ms";
     }
 
@@ -181,7 +181,7 @@ public class ThreadController {
                 if (threadPool.isTerminated()) {
                     final long end = System.currentTimeMillis();
                     long cost = (end - start);
-                    System.out.println("第"+k+1+"次，"+roomCount * msgCount + " 条消息 自研 共耗时：" + cost + "ms");
+                    System.out.println("第"+(k+1)+"次，"+roomCount * msgCount + " 条消息 自研 共耗时：" + cost + "ms");
                     time = time + cost;
                     break;
                 }
@@ -230,7 +230,7 @@ public class ThreadController {
                 /**判断所有worker 是否执行完成*/
                 if (master.isComplete()) {
                     long cost = (System.currentTimeMillis() - start);
-                    System.out.println("第"+k+1+"次，"+"master-worker 设计模式：" + roomCount * msgCount + "条数据，新自研线程模型 ，执行耗时为: " + cost + "ms");
+                    System.out.println("第"+(k+1)+"次，"+"master-worker 设计模式：" + roomCount * msgCount + "条数据，新自研线程模型 ，执行耗时为: " + cost + "ms");
                     master.detroy();
                     time = time + cost;
                     break;
