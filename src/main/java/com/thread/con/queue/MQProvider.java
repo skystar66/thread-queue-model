@@ -2,6 +2,7 @@ package com.thread.con.queue;
 
 
 import com.thread.con.room.LiveRoom;
+import com.thread.con.vo.MessageEvent;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,15 +12,19 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class MQProvider {
 
-    public static final int threadCnt = Runtime.getRuntime().availableProcessors()*2;//队列数量
+    public static final int threadCnt = Runtime.getRuntime().availableProcessors() * 2;//队列数量
 
 
     public static final Map<Integer, ConcurrentLinkedQueue<LiveRoom>> rPCRoomMsgQueueMap = new HashMap<>();
+    public static final Map<Integer, ConcurrentLinkedQueue<MessageEvent>> rPCMessageEventMsgQueueMap = new HashMap<>();
 
 
     static {
         for (int i = 0; i < threadCnt; i++) {
             rPCRoomMsgQueueMap.put(i,
+                    new ConcurrentLinkedQueue<>());
+
+            rPCMessageEventMsgQueueMap.put(i,
                     new ConcurrentLinkedQueue<>());
         }
     }
@@ -32,6 +37,16 @@ public final class MQProvider {
      */
     public static ConcurrentLinkedQueue<LiveRoom> getFromRPCRoomMsgQueueByIndex(int index) {
         return rPCRoomMsgQueueMap.get(index);
+    }
+
+    /**
+     * 得到与index相匹配的队列
+     *
+     * @param index
+     * @return
+     */
+    public static ConcurrentLinkedQueue<MessageEvent> getFromRPCMessageEventMsgQueueByIndex(int index) {
+        return rPCMessageEventMsgQueueMap.get(index);
     }
 
     /**
@@ -50,8 +65,17 @@ public final class MQProvider {
      *
      * @return
      */
-    public static ConcurrentLinkedQueue<LiveRoom>  getFromRPCRoomMsgQueueByRandom() {
+    public static ConcurrentLinkedQueue<LiveRoom> getFromRPCRoomMsgQueueByRandom() {
         return rPCRoomMsgQueueMap.get(RandomUtils.nextInt(0, threadCnt));
+    }
+
+    /**
+     * 得到随机的队列
+     *
+     * @return
+     */
+    public static ConcurrentLinkedQueue<MessageEvent> getFromRPCMessageEventMsgQueueByRandom() {
+        return rPCMessageEventMsgQueueMap.get(RandomUtils.nextInt(0, threadCnt));
     }
 
     /**
@@ -66,20 +90,32 @@ public final class MQProvider {
         }
     }
 
+    /**
+     * push 消息
+     *
+     * @param msg
+     */
+    public static void pushMessageEvent(MessageEvent msg) {
+        if (null != msg) {
+            getFromRPCMessageEventMsgQueueByRandom()
+                    .offer(msg);
+        }
+    }
+
 
     /**
      * push 消息
      *
      * @param msg
      */
-    public static void push(LiveRoom msg,String roomId) {
+    public static void push(LiveRoom msg, String roomId) {
 
         if (StringUtils.isNotEmpty(roomId)) {
             try {
                 getFromRPCRoomMsgQueueByKey(roomId.hashCode()).offer(msg);
-            }catch (Exception ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
-                System.out.println(roomId+"error"+ex);
+                System.out.println(roomId + "error" + ex);
             }
             return;
         }

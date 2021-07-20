@@ -42,6 +42,8 @@ public class MQConsumer3 implements Runnable {
 //        executors.shutdown();
 
 
+        System.out.println("1111");
+
     }
 
     @Override

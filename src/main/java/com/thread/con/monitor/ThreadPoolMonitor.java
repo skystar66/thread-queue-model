@@ -71,8 +71,8 @@ public class ThreadPoolMonitor extends ThreadPoolExecutor {
     @Override
     public void shutdown() {
         // 统计已执行任务、正在执行任务、未执行任务数量
-        LOGGER.info("{} Going to shutdown. Executed tasks: {}, Running tasks: {}, Pending tasks: {}",
-                this.poolName, this.getCompletedTaskCount(), this.getActiveCount(), this.getQueue().size());
+//        LOGGER.info("{} Going to shutdown. Executed tasks: {}, Running tasks: {}, Pending tasks: {}",
+//                this.poolName, this.getCompletedTaskCount(), this.getActiveCount(), this.getQueue().size());
         super.shutdown();
     }
 
@@ -82,8 +82,8 @@ public class ThreadPoolMonitor extends ThreadPoolExecutor {
     @Override
     public List<Runnable> shutdownNow() {
         // 统计已执行任务、正在执行任务、未执行任务数量
-        LOGGER.info("{} Going to immediately shutdown. Executed tasks: {}, Running tasks: {}, Pending tasks: {}",
-                this.poolName, this.getCompletedTaskCount(), this.getActiveCount(), this.getQueue().size());
+//        LOGGER.info("{} Going to immediately shutdown. Executed tasks: {}, Running tasks: {}, Pending tasks: {}",
+//                this.poolName, this.getCompletedTaskCount(), this.getActiveCount(), this.getQueue().size());
         return super.shutdownNow();
     }
 
@@ -106,14 +106,14 @@ public class ThreadPoolMonitor extends ThreadPoolExecutor {
         // 统计任务耗时、初始线程数、核心线程数、正在执行的任务数量、
         // 已完成任务数量、任务总数、队列里缓存的任务数量、池中存在的最大线程数、
         // 最大允许的线程数、线程空闲时间、线程池是否关闭、线程池是否终止
-        LOGGER.info("{}-pool-monitor: " +
-                        "Duration: {} ms, PoolSize: {}, CorePoolSize: {}, Active: {}, " +
-                        "Completed: {}, Task: {}, Queue: {}, LargestPoolSize: {}, " +
-                        "MaximumPoolSize: {},  KeepAliveTime: {}, isShutdown: {}, isTerminated: {}",
-                this.poolName,
-                diff, this.getPoolSize(), this.getCorePoolSize(), this.getActiveCount(),
-                this.getCompletedTaskCount(), this.getTaskCount(), this.getQueue().size(), this.getLargestPoolSize(),
-                this.getMaximumPoolSize(), this.getKeepAliveTime(TimeUnit.MILLISECONDS), this.isShutdown(), this.isTerminated());
+//        LOGGER.info("{}-pool-monitor: " +
+//                        "Duration: {} ms, PoolSize: {}, CorePoolSize: {}, Active: {}, " +
+//                        "Completed: {}, Task: {}, Queue: {}, LargestPoolSize: {}, " +
+//                        "MaximumPoolSize: {},  KeepAliveTime: {}, isShutdown: {}, isTerminated: {}",
+//                this.poolName,
+//                diff, this.getPoolSize(), this.getCorePoolSize(), this.getActiveCount(),
+//                this.getCompletedTaskCount(), this.getTaskCount(), this.getQueue().size(), this.getLargestPoolSize(),
+//                this.getMaximumPoolSize(), this.getKeepAliveTime(TimeUnit.MILLISECONDS), this.isShutdown(), this.isTerminated());
     }
 
     /**
