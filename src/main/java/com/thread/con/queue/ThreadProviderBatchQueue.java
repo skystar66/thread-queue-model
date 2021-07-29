@@ -2,8 +2,6 @@ package com.thread.con.queue;
 
 import com.thread.con.vo.Message;
 
-import java.util.Map;
-
 
 /**
  * 返回线程池对象
