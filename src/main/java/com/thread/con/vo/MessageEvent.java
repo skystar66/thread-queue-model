@@ -13,4 +13,9 @@ public class MessageEvent {
     }
 
     private String msg;
+
+    public void clearForGc() {
+        this.msg = null;
+    }
+
 }

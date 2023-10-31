@@ -1,12 +1,9 @@
 package com.thread.con.rest;
 
-import com.thread.con.disruptor.DisruptorUtil;
 import com.thread.con.monitor.ThreadPoolMonitor;
-import com.thread.con.queue.MQConsumerMessageEvent;
 import com.thread.con.queue.MQProvider;
 import com.thread.con.queue.ThreadProviderBatchQueue;
 import com.thread.con.vo.Message;
-import com.thread.con.vo.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 @RestController

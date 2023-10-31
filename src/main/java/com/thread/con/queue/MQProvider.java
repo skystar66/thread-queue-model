@@ -2,6 +2,7 @@ package com.thread.con.queue;
 
 
 import com.thread.con.room.LiveRoom;
+import com.thread.con.utils.HashCodeUtils;
 import com.thread.con.vo.MessageEvent;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +62,17 @@ public final class MQProvider {
     }
 
     /**
+     * 得到与key 取模的队列
+     *
+     * @param key
+     * @return
+     */
+    public static ConcurrentLinkedQueue<LiveRoom> getFromRPCRoomMsgQueueByKey(String key) {
+        int index = HashCodeUtils.getHashCode(key) % threadCnt;
+        return rPCRoomMsgQueueMap.get(index);
+    }
+
+    /**
      * 得到随机的队列
      *
      * @return
@@ -76,6 +88,18 @@ public final class MQProvider {
      */
     public static ConcurrentLinkedQueue<MessageEvent> getFromRPCMessageEventMsgQueueByRandom() {
         return rPCMessageEventMsgQueueMap.get(RandomUtils.nextInt(0, threadCnt));
+    }
+
+    /**
+     * 得到随机的队列
+     *
+     * @return
+     */
+    public static ConcurrentLinkedQueue<MessageEvent> getFromRPCMessageEventMsgQueueByRandom(String key) {
+
+        int index = HashCodeUtils.getHashCode(key) % threadCnt;
+        return rPCMessageEventMsgQueueMap.get(index);
+
     }
 
     /**
@@ -97,7 +121,7 @@ public final class MQProvider {
      */
     public static void pushMessageEvent(MessageEvent msg) {
         if (null != msg) {
-            getFromRPCMessageEventMsgQueueByRandom()
+            getFromRPCMessageEventMsgQueueByRandom(msg.getMsg())
                     .offer(msg);
         }
     }
